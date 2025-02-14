@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Affiliation Search</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script>
+        async function fetchAffiliations() {
+            const query = document.getElementById("query").value;
+            const numResults = document.getElementById("num_results").value;
+
+            if (!query) {
+                alert("Please enter a search query.");
+                return;
+            }
+
+            const response = await fetch(`/affiliations?query=${encodeURIComponent(query)}&num_results=${numResults}`);
+            const affiliations = await response.json();
+
+            const resultContainer = document.getElementById("results");
+            resultContainer.innerHTML = "";
+
+            if (affiliations.length === 0) {
+                resultContainer.innerHTML = `<p class="text-gray-600">No affiliations found.</p>`;
+            } else {
+                affiliations.forEach((affiliation) => {
+                    const affilCard = document.createElement("div");
+                    affilCard.className = "bg-white shadow-md rounded p-4 mb-4";
+
+                    const name = affiliation.name || "N/A";
+                    const city = affiliation.city || "N/A";
+                    const country = affiliation.country || "N/A";
+
+                    affilCard.innerHTML = `
+                        <h3 class="text-lg font-semibold">${name}</h3>
+                        <p class="text-gray-700">City: ${city}</p>
+                        <p class="text-gray-700">Country: ${country}</p>
+                    `;
+                    resultContainer.appendChild(affilCard);
+                });
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+    <div class="container mx-auto p-6 bg-white shadow-lg rounded-lg max-w-md">
+        <h1 class="text-2xl font-bold mb-6 text-center">Affiliation Search</h1>
+        <div class="mb-4">
+            <label for="query" class="block text-sm font-medium text-gray-700">Search Query</label>
+            <input type="text" id="query" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="Enter your search query">
+        </div>
+        <div class="mb-6">
+            <label for="num_results" class="block text-sm font-medium text-gray-700">Number of Results</label>
+            <input type="number" id="num_results" value="10" min="1" max="100" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+        </div>
+        <button onclick="fetchAffiliations()" class="w-full bg-blue-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+            Search
+        </button>
+        <div id="results" class="mt-6"></div>
+    </div>
+</body>
+</html>
